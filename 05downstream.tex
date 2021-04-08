@@ -1,0 +1,359 @@
+% !TeX document-id = {f19fb972-db1f-447e-9d78-531139c30778}
+% !BIB program = biber
+\documentclass[compress]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage{pifont}
+\usetheme[block=fill,subsectionpage=progressbar,sectionpage=progressbar]{metropolis} 
+
+\usepackage{wasysym}
+\usepackage{etoolbox}
+\usepackage[utf8]{inputenc}
+
+\usepackage{threeparttable}
+\usepackage{subcaption}
+
+\usepackage{tikz-qtree}
+\setbeamercovered{still covered={\opaqueness<1->{5}},again covered={\opaqueness<1->{100}}}
+
+
+\usepackage{listings}
+
+\lstset{
+	basicstyle=\scriptsize\ttfamily,
+	columns=flexible,
+	breaklines=true,
+	numbers=left,
+	%stepsize=1,
+	numberstyle=\tiny,
+	backgroundcolor=\color[rgb]{0.85,0.90,1}
+}
+
+
+
+\lstnewenvironment{lstlistingoutput}{\lstset{basicstyle=\footnotesize\ttfamily,
+		columns=flexible,
+		breaklines=true,
+		numbers=left,
+		%stepsize=1,
+		numberstyle=\tiny,
+		backgroundcolor=\color[rgb]{.7,.7,.7}}}{}
+
+
+\lstnewenvironment{lstlistingoutputtiny}{\lstset{basicstyle=\tiny\ttfamily,
+		columns=flexible,
+		breaklines=true,
+		numbers=left,
+		%stepsize=1,
+		numberstyle=\tiny,
+		backgroundcolor=\color[rgb]{.7,.7,.7}}}{}
+
+
+
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage[style=apa, backend = biber]{biblatex}
+\DeclareLanguageMapping{american}{american-UoN}
+\addbibresource{../bdaca/bdaca.bib }
+\renewcommand*{\bibfont}{\tiny}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,matrix}
+\usepackage{multicol}
+
+\usepackage{subcaption}
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+
+\graphicspath{{../bdaca/pictures/}}
+
+\makeatletter
+\setbeamertemplate{headline}{%
+	\begin{beamercolorbox}[colsep=1.5pt]{upper separation line head}
+	\end{beamercolorbox}
+	\begin{beamercolorbox}{section in head/foot}
+		\vskip2pt\insertnavigation{\paperwidth}\vskip2pt
+	\end{beamercolorbox}%
+	\begin{beamercolorbox}[colsep=1.5pt]{lower separation line head}
+	\end{beamercolorbox}
+}
+\makeatother
+
+
+
+\setbeamercolor{section in head/foot}{fg=normal text.bg, bg=structure.fg}
+
+
+
+\newcommand{\question}[1]{
+	\begin{frame}[plain]
+		\begin{columns}
+			\column{.3\textwidth}
+			\makebox[\columnwidth]{
+				\includegraphics[width=\columnwidth,height=\paperheight,keepaspectratio]{mannetje.png}}
+			\column{.7\textwidth}
+			\large
+			\textcolor{orange}{\textbf{\emph{#1}}}
+		\end{columns}
+\end{frame}}
+
+\newcommand{\instruction}[1]{\emph{\textcolor{gray}{[#1]}}}
+
+
+
+
+\title{Beyond Counting Words: Working with Word Embeddings}
+\author[Damian Trilling]{Damian Trilling \\ ~ \\ \footnotesize{d.c.trilling@uva.nl \\@damian0604} \\ \url{www.damiantrilling.net}}
+\date{12--13 April 2021}
+\institute[UvA]{Afdeling Communicatiewetenschap \\Universiteit van Amsterdam}
+
+\begin{document}
+
+\begin{frame}{}
+	\titlepage
+\end{frame}
+
+\begin{frame}{This part: Embeddings for downstream tasks}
+	\tableofcontents
+\end{frame}
+
+
+
+\setbeamercovered{transparent}
+
+
+\section{In document comparison}
+
+
+\begin{frame}{An example \parencite{Trilling2021}}
+	Let's say we have a large corpus of news articles and what to find those that are about the same events.
+
+\end{frame}
+
+
+\begin{frame}{Data}
+	\begin{itemize}
+		\item 45K articles
+		\item 6 months
+		\item volkskrant.nl, ad.nl, nu.nl
+	\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Step 1: Get candidate articles}
+	Comparing everything with everything is
+	\begin{itemize}
+		\item computationally infeasible
+		\item theoretical nonsensical
+	\end{itemize}
+	
+	\begin{block}{Our solution}
+		\begin{itemize}
+			\item Three-day moving window (but ``chaining'' possible)
+			\item  Saturday/Sunday merged into one day
+		\end{itemize}
+	\end{block}
+	
+\end{frame}
+
+
+
+
+\begin{frame}{Step 2: Get similarity scores}
+	How to determine similarity between articles?
+	
+	
+	\begin{block}{Our solution}
+		Compare combinations of 
+		\begin{itemize}
+			\item different measures (in particular, $tf\cdot idf$ cosine similarity vs. softcosine similarity
+			\item different thresholds (to get rid of the overwhelming majority of close-to-zero edges) 
+		\end{itemize}
+		
+	\end{block}
+	
+\end{frame}
+
+
+\begin{frame}{Step 3: Network clustering}
+	How to determine events?
+	
+	After experimenting \emph{a lot}:
+	
+	\begin{block}{Our final solution}
+		\begin{itemize}
+			\item One network for all (instead of one per window)
+			\item Articles are nodes, similarity scores = edge weights
+			\item all edges with weight $<$ threshold removed
+			\item Leiden algorithm (\cite{Traag2019}) with Surprise method (\cite{Traag2015}) (very suitable for smaller, but more clusters)
+		\end{itemize}
+	\end{block}
+	
+\end{frame}
+
+
+\begin{frame}{Number of articles per event}
+	
+	\begin{table}[h]
+		\caption{Descriptives for different threshold/similarity combinations\label{tab:thresholds}}
+		
+		\centering
+		\resizebox{\textwidth}{!}{%
+			\begin{tabular}{lrrrrr|rrrrr}
+				\toprule
+				{} & \multicolumn{5}{c}{\textbf{cosine}} & \multicolumn{5}{c}{\textbf{softcosine}} \\
+				{} &    0.2  & 0.3 & 0.4 & 0.5 & 0.6 & 0.2 & 0.3  & 0.4 & 0.5 & 0.6  \\
+				\midrule
+				mean              &  2.03 & 1.58 & 1.35 & 1.21 & 1.12 & 6.78 & 2.89 & 1.88 & 1.51  & 1.27 \\
+				std              &  3.48 & 2.00 & 1.22 & 0.71 & 0.45  & 30.41 & 10.04 & 4.27 & 2.27 & 1.07 \\
+				max              &   88 & 53 & 41 & 21   & 15 & 551 & 367 & 161 & 70 & 30  \\
+				single-art.\\ events & 15626  & 21854  & 27135 & 32232 & 36348 & 4262 & 11043 & 18305 & 24337 & 30700 \\
+				multi-art.\\ events & 6685 & 6777 & 6241 & 5165 & 3899 & 2460 & 4736 & 5961 & 5940 & 5257 \\
+				\bottomrule
+			\end{tabular}
+		}%
+	\end{table}
+\end{frame}
+
+
+
+\begin{frame}{What does that mean?}
+	\begin{itemize}
+		\item Use a high threshold!
+		\item Soft-cosine finds some more events, leaves less articles unassigned (good), but that comes at the expense of slightly lower precision
+		\item Example from our data: Because soft-cosine ``understands'' that Nike and Puma are both sports brands, it incorrectly assigned economic coverage about the two to one event.
+	\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{How correct are the events?}
+	We manually checked $6 \times 100$ events, qualitatively (not shown) and quantitatively:
+	\begin{table}
+	\begin{tabular}{lrrrr}
+		\footnotesize
+		\textbf{Similarity}   & \textbf{Threshold} & \textbf{Prec. 1 (\%)} & \textbf{Prec. 2 (\%)} &\textbf{TP/max. TP}  \\
+		\midrule
+		cosine              & 0.4       & 74        & 88.52     & 223/268 \\
+		cosine              & 0.5       & 78        & 89.02     & 217/253 \\
+		cosine              & 0.6       & 89        & 94.39     & 204/225 \\
+		softcosine          & 0.4       & 56        & 76.20     & 234/521 \\
+		softcosine          & 0.5       & 65        & 81.77     & 236/379 \\
+		softcosine          & 0.6       & 75        & 86.92     & 222/289 \\
+
+	\end{tabular}
+	\end{table}
+\tiny 
+	\textit{Note.} \textit{Precision 1:} The percentage of news events that are entirely clustered correctly. \textit{Precision 2:} The percentage of news articles that are correctly clustered. \textit{max. TP} is the number of articles that are assigned to an event in the sample; hence, the maximum number of true positives that can be achieved.\\
+	
+\end{frame}
+
+\begin{frame}{Cosine vs Softcosine}
+	Also a matter of computational costs
+\begin{itemize}
+	\item the document needs to be converted into embeddings
+	\item but once that is done, our document vectors only have 300 instead of thousands of dimensions!
+\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+\instruction{let's try this out in a notebook}
+\end{frame}
+
+
+\section{In SML}
+
+\begin{frame}{In classical SML:}
+\begin{itemize}[<+->]
+	\item we represent each document by a vector of word frequencies (or tf$\cdot$ idf scores)
+	\item use these vectors to predict the label
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[plain]
+	\begin{table}[]
+		\resizebox{\textwidth}{!}{%
+			\begin{tabular}{lllllllll}
+				& ability & about & above & \ldots & zippered  & zealotry & $\rightarrow$ & \textcolor{orange}{topic} \\
+				text1 & \ding{110}  & \ding{110}  &\ding{110}  & \ldots & \ding{110}  & \ding{110} & $\rightarrow$ &\textcolor{orange}{\ding{110}}  \\
+				text2 & \ding{110}  & \ding{110}   &\ding{110} & \ldots  & \ding{110}  & \ding{110} & $\rightarrow$ &\textcolor{orange}{\ding{110}} \\
+				text3 & \ding{110}  & \ding{110}   &\ding{110} & \ldots & \ding{110}  & \ding{110} & $\rightarrow$ &\textcolor{orange}{\ding{110}} \\
+				text4 & \ding{110}  & \ding{110}  &\ding{110} & \ldots  & \ding{110}  & \ding{110} & $\rightarrow$ &\textcolor{orange}{\ding{110}} \\
+				&&&&&&& \\
+				new case & \ding{110}  & \ding{110}  & \ding{110}  & \ldots & \ding{110}  & \ding{110} & $\rightarrow$ &\textbf{\textcolor{orange}{?}} \\
+			\end{tabular}%
+		}
+\raggedright	
+	For instance, topic can be [``sports'', ``economy'', ``politics''] and the other entries are word frequencies
+	\end{table}
+\end{frame}
+
+\begin{frame}{Our BOW approach until now}
+	\begin{block}{Representing a document by word frequency counts}
+		Result of preprocessing and vectorizing:
+		
+		0. \texttt{He took the dog for a walk to the dog playground}\\
+		$\Rightarrow$ \texttt{took dog walk dog playground}\\
+		$\Rightarrow$ \texttt{'took':1, 'dog': 2, walk: 1, playground: 1}
+	\end{block}
+	
+	Consider these other sentences
+	\begin{enumerate}
+		\item He took the doberman for a walk to the dog playground
+		\item He took the cat for a walk to the dog playground
+		\item He killed the dog on his walk to the dog playground 
+	\end{enumerate}
+	
+	The vectorized representations of these sentences have a ``distance'' (dissimilarity) of 1 each, but arguably, sentences 0 and 1 should be ``closer'' than others
+	
+\end{frame}
+
+
+\begin{frame}{The idea}
+We modify our vectorizer such that
+\begin{itemize}[<+->]
+	\item for each word in the document, we look up its embedding
+	\item we then aggregate these embeddings (e.g., mean, max, or sum)
+	\item For each document, we now have a 300-dimensional instead of a 10,000-dimensional vector\footnote{in the case of a 300-dimensional embedding model and a vocabulary size of 10,000 of the traditional CountVectorizer)}
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}{What does that mean?}
+A couple of things:
+	\begin{itemize}[<+->]
+		\item Our model is smaller
+		\item We can use words in the prediction dataset \emph{even if it's not in the training dataset}\footnote{as long as it's in the embedding model, of course}
+		\item We can learn from similar training samples even if they do not use the same words
+		\item But we also may loose some nuance
+		\end{itemize}
+\end{frame}
+	
+	
+	
+	
+\begin{frame}{Let's look at an example}
+	As we see, not \emph{all} embedding models are improving downstream tasks -- but good ones can:
+\url{https://github.com/annekroon/amsterdam-embedding-model}
+
+\instruction{explain results in README.md}
+\end{frame}
+	
+\begin{frame}[plain]
+\instruction{Let's do this ourselves in a notebook}
+\end{frame}
+
+
+
+
+\begin{frame}[plain]
+	\printbibliography
+\end{frame}
+
+
+\end{document}

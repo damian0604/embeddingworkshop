@@ -7,11 +7,21 @@ It will be adapted according to the needs and the progress of the participants.
 
 |Time|Topic|Slides|Notebooks|
 |-|-|-|-|
-| 9.00-10.30 | Intro + Recap | 01recap.pdf | none/live  |
+| 9.00-10.30 | 1: Intro + Recap | 01recap.pdf | none/live  |
 | 10.30-10.45 | Coffee  |  --  | -- |
-| 10.45-12.15 | ML on textual data | 02gensimscikit.pdf  | 02schikitgensim.ipynb |
+| 10.45-12.15 | 2: ML on textual data | 02gensimscikit.pdf  | 02schikitgensim.ipynb |
 | 12.15-12.45 | Lunch | -- | -- |
-| 12.45-14.15 | The idea behind word embeddings | 03embeddingsbackground.pdf | -- |
+| 12.45-14.15 | 3: The idea behind word embeddings | 03embeddingsbackground.pdf | -- |
 | 14.15-14.30 | Coffee |
-| 14.30-16.00 | Exercise | -- | 04exercise.ipynb |
+| 14.30-16.00 | 4: Exercise | -- | 04exercise.ipynb |
+
+
+## DAY 23
+
+|Time|Topic|Slides|Notebooks|
+|-|-|-|-|
+| 9.00-9.30 | Questions from yesterday?|  -- | --  
+| 9.30-10.30 | 5: Embeddings for downstream tasks | 05downstream.pdf | 05downstream.ipynb| 
+| 10.30-10.45 | Coffee  |  --  | -- |
+| 10.45-11.45 | 5: Embeddings for downstream tasks continued | 05downstream.pdf | 05downstream.ipynb| 
 
