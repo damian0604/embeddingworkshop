@@ -124,10 +124,6 @@
 
 \section{From word counts to word vectors}
 
-\begin{frame}[plain]
-	From word counts to word vectors
-\end{frame}
-
 
 \begin{frame}{Our BOW approach until now}
 	\begin{block}{Representing a document by word frequency counts}
@@ -166,11 +162,23 @@
 
 
 \section{Training word embeddings}
-\begin{frame}[plain]
-	Training word embeddings
+
+
+\begin{frame}{GloVe vs Word2Vec}
+	There are two popular approaches to training word embeddings: GloVe and word2vec.
+	\begin{itemize}
+		\item GloVe is count-based: dimensionality reduction on the co-occurrence counts matrix.
+		\item Word2Vec is a predictive model: neural network to predict words/contexts
+		\item That means that GloVe takes global context into account, word2vec local context
+		\item Some technical implications for how training can be implemented 
+		\item \textbf{However, only subtle differences in final result.}
+	\end{itemize}
+	
 \end{frame}
 
-\begin{frame}{Continous Bag of Words (CBOW) vs skipgram}
+
+
+\begin{frame}{Word2Vec: Continous Bag of Words (CBOW) vs skipgram}
 	Example sentence: ``the quick brown fox jumped over the lazy dog''
 	\begin{block}{CBOW: Predict a word given its context}
 		Dataset:
@@ -207,6 +215,8 @@
 	
 	\tiny{* If that makes you think of PCA/SVD, that's not completely crazy, see Levy, O., Goldberg, Y., \& Dagan, I. (2018). Improving Distributional Similarity with Lessons Learned from Word Embeddings. \textit{Transactions of the Association for Computational Linguistics, 3}, 211--225. doi:10.1162/tacl\_a\_00134}\\
 \end{frame}
+
+
 
 
 \begin{frame}{``...a word is characterized by the company it keeps...'' (Firth, 1957)}
@@ -525,7 +535,7 @@
 \begin{frame}{Re-usability}
 	\begin{block}{Reusing model and data}
 		\begin{enumerate}
-			\item The final Amsterdam Embedding Model will be made available at \url{https://github.com/annekroon/AEM}
+			\item See \url{https://github.com/annekroon/amsterdam-embedding-model}
 			\item Open access to all the code
 		\end{enumerate}
 	\end{block}
