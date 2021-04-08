@@ -641,10 +641,14 @@ for e in mygen:
 \begin{frame}[fragile]{Counting words}
 \begin{lstlisting}
 from collections import Counter
+import re   # for alternative tokenization only
 
 texts = ['This is the first text text text first', 'And another text yeah yeah']
 
+# split on spaces
 tokenized_texts = [t.split() for t in texts] 
+# alternative that splits on all "non-word" characters: 
+# tokenized_texts = [re.split(r"\W",t) for t in texts] 
 
 c = Counter(tokenized_texts[0]) 
 print(c.most_common(3) 
@@ -658,14 +662,13 @@ print(c2.most_common(3))
 
 \texttt{[('yeah', 2), ('And', 1), ('another', 1)]}
 
-\pause
-
-\textbf{\textcolor{red}{What do we have to improve?}}
 
 \end{frame}
 
 
 \begin{frame}[fragile]{Some preprocessing}{(more about this later today)}
+\textbf{\textcolor{red}{What do we have to improve?}}
+\pause
 
 
 lowercasing

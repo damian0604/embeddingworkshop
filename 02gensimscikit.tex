@@ -201,6 +201,22 @@ where $N$ is the total number of documents and $n_t$ is the number of documents 
 \end{itemize}
 \end{frame}
 
+\begin{frame}{TheTdidfVecotrizer}
+\begin{block}{A small sidenote}
+If you calculate tf$\cdot$idf scores by hand, you will see that they differ from what scikit-learn reports.
+
+First, scikit-learn adds 1 to both $N$ and $n_t$ to avoid divisions by zero and taking the logarithm of zero:
+	$$idf_{t} = \log \frac{N + 1}{n_t +1}$$
+	
+Second, the scores that scikit-learn reports are \emph{normalized} using the he Eucledian norm.
+
+\tiny For more info, see \url{https://scikit-learn.org/stable/modules/feature\_extraction.html\#text-feature-extraction}
+
+
+\end{block}
+\end{frame}
+
+
 
 \begin{frame}[fragile]{Using a scikit-learn vectorizer}
 \begin{lstlisting}
@@ -368,9 +384,6 @@ print(vec.transform(texts).todense())
 \subsection{Zooming in on supervised ML}
 
 
-
-
-\subsection{You have done it before!}
 \begin{frame}{You have done it before!}
 	\begin{block}{Regression}<2->
 		\begin{enumerate}
